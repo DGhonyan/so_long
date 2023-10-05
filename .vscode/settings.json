@@ -1,7 +1,0 @@
-{
-	"editor.detectIndentation": false,
-	"editor.insertSpaces": false,
-	"files.associations": {
-		"so_long.h": "c"
-	}
-}
