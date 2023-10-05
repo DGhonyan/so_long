@@ -19,7 +19,7 @@ void	check_args(int argc, char *filename)
 {
 	if (argc < 2)
 	{
-		ft_printf(RED "Not enough arguments\n" COLOR_RESET);
+		ft_printf(CYAN "Usage: ./so_long maps/map[num].ber\n" COLOR_RESET);
 		exit (EXIT_FAILURE);
 	}
 	if (argc > 2)
@@ -38,9 +38,9 @@ int	main(int argc, char **argv)
 {
 	char	**map;
 
-	map = parse_map(argv[1]);
 	check_args(argc, argv[1]);
+	map = parse_map(argv[1]);
 	free_exit_cond(map, NULL, NULL, !map_check(map));
 	free_ptr_arr(map);
-	mlx_init_stuff(argv[1]);
+	init_mlx(argv[1]);
 }

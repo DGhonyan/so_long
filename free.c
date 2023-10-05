@@ -12,32 +12,35 @@
 
 #include "so_long.h"
 
-static void	check_tile(t_mlx *mlx)
+void	perror_exit_cond(char *errmsg, int cond)
 {
-	if (mlx->map[mlx->player->i][mlx->player->j] == 'C')
+	if (cond)
 	{
-		mlx->map[mlx->player->i][mlx->player->j] = '0';
-		draw_single_floor(mlx);
-	}
-	if (mlx->map[mlx->player->i][mlx->player->j] == 'E'
-		&& !get_count(mlx->map, 'C'))
-		hook(mlx);
-	if (mlx->map[mlx->player->i][mlx->player->j] == 'X')
-	{
-		ft_printf(RED "GAME OVER!\n" COLOR_RESET);
-		hook (mlx);
+		perror(errmsg);
+		exit (EXIT_FAILURE);
 	}
 }
 
-void	move(t_mlx *mlx, int change_x, int change_y, int posx, int posy)
+void	free_exit(char **arr, char *s, char *errmsg)
 {
-	draw_single_floor(mlx);
-	redraw_exit(mlx);
-	mlx->player->posx += change_x;
-	mlx->player->posy += change_y;
-	mlx->player->j += posx;
-	mlx->player->i += posy;
-	check_tile(mlx);
-	mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr,
-		mlx->player->img, (mlx->player)->posx, (mlx->player)->posy);
+	if (errmsg)
+		perror (errmsg);
+	if (arr)
+		free_ptr_arr(arr);
+	free(s);
+	exit (EXIT_FAILURE);
+}
+
+void	free_exit_cond(char **arr, char *s, char *errmsg, int cond)
+{
+	if (cond)
+	{
+		if (errmsg)
+			perror (errmsg);
+		if (arr)
+			free_ptr_arr(arr);
+		if (s)
+			free(s);
+		exit (EXIT_FAILURE);
+	}
 }

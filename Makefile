@@ -1,40 +1,60 @@
 NAME = so_long
+UNAME = $(shell uname -s)
+
 CC = cc
-CFLAGS = -c -Wall -Wextra -Werror#TODO add flags
-# MLX = -lmlx -L /usr/local/include -framework AppKit -framework OpenGL
-# MLX = -I/usr/include -Imlx_linux -O3
-# MLX_LINUX = -Lmlx_linux -lmlx_Linux -L/usr/lib -Imlx_linux -lXext -lX11 -lm -lz
+CFLAGS = -c -Wall -Wextra -Werror
+
 MLX = -lmlx -L mlx -framework AppKit -framework OpenGL
+MLX_DIR = mlx
+OBJDIR = obj
+
 LIBFT = -lft -L libft
 FT_PRINTF = -lftprintf -L ft_printf
+
 SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c=.o)
+TEMP = $(SRCS:.c=.o)
+OBJS = $(addprefix $(OBJDIR)/, $(TEMP))
 
-%.c:
-	$(CC) $(CFLAGS) $(SRCS)
 
-all: lib ftprintf $(NAME)
+ifeq ($(UNAME), Linux)
+MLX = -Lmlx_linux -lmlx_Linux -L/usr/lib -Imlx_linux -lXext -lX11 -lm -lz
+MLX_DIR = mlx_linux
+CFLAGS += -D LINUX
+endif
+
+$(OBJDIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+all: lib ftprintf mlx mkdir $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(OBJS) $(LIBFT) $(FT_PRINTF) $(MLX) -o $(NAME)
 
-# Linux
-# $(NAME): $(OBJS)
-# 	$(CC) $(OBJS) $(LIBFT) $(FT_PRINTF) $(MLX) $(MLX_LINUX) -o $(NAME)
+mkdir:
+	@mkdir -p $(OBJDIR)
 
+mlx:
+	@cd $(MLX_DIR) && make
 
 ftprintf:
-	cd ft_printf && make
+	@cd ft_printf && make
 
 lib:
-	cd libft && make 
+	@cd libft && make 
 
 clean:
-	rm -f ./*.o libft/*.o ft_printf/*.o
+	rm -rf $(OBJDIR)
+	make clean -C libft
+	make clean -C ft_printf
 
 fclean: clean
-	rm -f $(NAME) libft/libft.a ft_printf/libftprintf.a
+	rm -f $(NAME)
+	make fclean -C libft
+	make fclean -C ft_printf
+
+clean_mlx:
+	make clean -C $(MLX_DIR)
 
 re: fclean all
 
-.PHONY: all clean fclean re lib ftprintf
+.PHONY: all clean fclean re lib ftprintf mlx mkdir

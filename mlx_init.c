@@ -15,43 +15,31 @@
 static void	init(t_mlx *mlx)
 {
 	mlx->collect_count = get_count(mlx->map, 'C');
-	mlx->walls = allocate_walls(mlx);
-	mlx->floor = allocate_floor(mlx);
-	mlx->collect = allocate_collect(mlx);
-	mlx->player = allocate_player(mlx);
-	mlx->exit = allocate_exit(mlx);
-	mlx->enemy = allocate_enemy(mlx);
+
+	mlx->walls = allocate(mlx, WALL_IMG);
+	mlx->floor = allocate(mlx, FLOOR_IMG);
+	mlx->collect = allocate(mlx, COLLECT_IMG);
+
+	mlx->exit = allocate_pos(mlx, EXIT_IMG, NULL, 'E');
+	mlx->player = allocate_pos(mlx, PLAYER_IMG1, PLAYER_IMG2, 'P');
+	mlx->enemy = allocate_pos(mlx, ENEMY_IMG1, ENEMY_IMG2,'X');
+
 	mlx->win_size_w = mlx->floor->w * ft_strlen(mlx->map[0]);
 	mlx->win_size_h = mlx->floor->h * ptr_arr_len(mlx->map);
-	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr,
-			mlx->win_size_w, mlx->win_size_h, "Hewwo");
-	draw_floor(mlx, mlx->map);
-	draw_walls(mlx, mlx->map);
-	draw_collect(mlx, mlx->map);
-	draw_exit(mlx);
-	draw_enemy(mlx, 0);
-	mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr,
-		mlx->player->img, mlx->player->posx, mlx->player->posy);
-}
+	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, mlx->win_size_w, mlx->win_size_h, "So long");
 
-static void	norm(int p_index, t_mlx *mlx)
-{
-	if (p_index % 2 == 0)
-	{
-		draw_single_floor(mlx);
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr,
-			mlx->player->img, mlx->player->posx, mlx->player->posy);
-	}
-	else
-	{
-		draw_single_floor(mlx);
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr,
-			mlx->player->img2, mlx->player->posx, mlx->player->posy);
-	}
+	draw(mlx, mlx->floor, 'F', -1);
+	draw(mlx, mlx->walls, '1', -1);
+	draw(mlx, mlx->collect, 'C', -1);
+	draw(mlx, mlx->enemy, 'X', 0);
+
+	mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->player->img, mlx->player->posx, mlx->player->posy);
+	mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->exit->img, mlx->exit->posx, mlx->exit->posy);
 }
 
 int	a(t_mlx *mlx)
 {
+	void		*texture;
 	static int	i = 0;
 	static int	index = 0;
 	static int	p_index = 0;
@@ -59,12 +47,15 @@ int	a(t_mlx *mlx)
 
 	if (i % 1250 == 0)
 	{
-		draw_enemy(mlx, index % 2);
+		draw(mlx, mlx->enemy, 'X', index % 2);
 		index++;
 	}
 	if (player % 2500 == 0)
 	{
-		norm(p_index, mlx);
+		texture = (p_index % 2 == 0 ? mlx->player->img : mlx->player->img2);
+		draw_single_floor(mlx);
+		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr,
+		texture, mlx->player->posx, mlx->player->posy);
 		p_index++;
 	}
 	i++;
@@ -72,7 +63,7 @@ int	a(t_mlx *mlx)
 	return (0);
 }
 
-void	mlx_init_stuff(char *filename)
+void	init_mlx(char *filename)
 {
 	t_mlx		mlx;
 
